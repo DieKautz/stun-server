@@ -22,7 +22,7 @@ data class STUNMessage(
     val messageType: MessageType,
     val messageLength: UShort,
     val magicCookie: UInt = 0x2112A442u,
-    val txId: ULong
+    val txId: ByteArray
 ) {
     init {
         if(magicCookie != 0x2112A442u) {
@@ -35,6 +35,6 @@ data class STUNMessage(
         MessageType.from(buffer.readUShort() and (0xFF shr 2).toUShort())!!,
         buffer.readUShort(),
         buffer.readUInt(),
-        buffer.readULong()
+        buffer.readBytes(12)
     )
 }
