@@ -18,7 +18,7 @@ fun main() {
     val host = System.getenv().getOrDefault("HOST", "127.0.0.1")
     val port = System.getenv().getOrDefault("PORT", "3478").toInt()
     runBlocking {
-        val serverSocket  = aSocket(SelectorManager(Dispatchers.IO))
+        val serverSocket = aSocket(SelectorManager(Dispatchers.IO))
             .udp()
             .bind(InetSocketAddress(host, port))
         LOG.info("Listening on ${serverSocket.localAddress}")
@@ -28,7 +28,7 @@ fun main() {
             val socketAddress = (datagram.address.toJavaAddress() as java.net.InetSocketAddress)
 
             LOG.info("datagram received from: ${socketAddress.address.hostAddress}")
-            when(stunMessage.messageType) {
+            when (stunMessage.messageType) {
                 MessageType.BindingRequest -> {
                     datagram.packet.close()
                     LOG.info("Message type is binding request! txid:${stunMessage.txId.toHex()}")

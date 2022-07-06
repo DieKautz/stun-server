@@ -25,13 +25,14 @@ data class STUNMessage(
     val txId: ByteArray
 ) {
     init {
-        if(magicCookie != 0x2112A442u) {
+        if (magicCookie != 0x2112A442u) {
             throw IllegalStateException("Datagram is not a STUN Message as of RFC5389!")
         }
     }
+
     @OptIn(ExperimentalUnsignedTypes::class)
     // throw away first 2 bits
-    constructor(buffer: ByteReadPacket): this(
+    constructor(buffer: ByteReadPacket) : this(
         MessageType.from(buffer.readUShort() and (0xFF shr 2).toUShort())!!,
         buffer.readUShort(),
         buffer.readUInt(),
