@@ -1,6 +1,7 @@
 package de.hpi.vs2022.face2face.rfc5389
 
 import de.hpi.vs2022.face2face.rfc5389.attributes.STUNMappedAddress
+import de.hpi.vs2022.face2face.rfc5389.attributes.STUNXORMappedAddress
 import io.ktor.utils.io.bits.*
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
@@ -23,7 +24,7 @@ class STUNBindingResponseMessage(
     )
 
     fun bytes(): ByteArray {
-        val mappedAddress = STUNMappedAddress(port, address)
+        val mappedAddress = STUNXORMappedAddress(txId, port, address)
         val mappedAddressBytes = mappedAddress.bytes()
         val payloadSize = mappedAddressBytes.size.toShort()
 
