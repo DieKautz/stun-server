@@ -13,9 +13,6 @@ data class STUNXORMappedAddress(val txId: ByteArray, val port: Int, val addressB
     private val cookie: Int = 0x2112A442
 
     fun bytes(): ByteArray {
-        LOG.info("IP Bytes are ${addressBytes.toHex()}")
-        LOG.info("Port is ${port}")
-
         val length = 4 + 4 + addressBytes.size
         val byteBuffer = ByteBuffer.allocate(length)
         byteBuffer.putShort(0x0020)
