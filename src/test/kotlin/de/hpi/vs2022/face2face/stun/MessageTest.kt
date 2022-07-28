@@ -12,6 +12,12 @@ import kotlin.test.assertFailsWith
 internal class MessageTest {
 
     @TestOnly
+    internal fun createRandomMessageNoAttr() = Message(
+        Message.Type.values().random(),
+        Random.Default.nextBytes(12)
+    )
+
+    @TestOnly
     private fun createMockMessageBytes(
         type: Message.Type = Message.Type.BindingResponse,
         length: Int = 20,
@@ -31,7 +37,7 @@ internal class MessageTest {
 
     @Test
     fun `first two bits are always zero`() {
-        val message = Message(Message.Type.BindingRequest, Random.Default.nextBytes(12))
+        val message = createRandomMessageNoAttr()
 
         val buffer = ByteBuffer.allocate(message.length())
         message.putBytes(buffer)
@@ -42,23 +48,22 @@ internal class MessageTest {
 
     @Test
     fun `indication gets read correctly`() {
+        val testMessage = createRandomMessageNoAttr()
 
-        val type = Message.Type.BindingResponse
-        val length = 20
         val magicCookie = 0x2112A442
-        val transactionId = Random.Default.nextBytes(12)
+        val length = 20
 
         val msgBytes = createMockMessageBytes(
-            type,
+            testMessage.type,
             length,
             magicCookie,
-            transactionId
+            testMessage.transactionId
         )
         val msg = Message.tryFromPacket(ByteReadPacket(msgBytes))
 
-        assertEquals(type, msg.type)
+        assertEquals(testMessage.type, msg.type)
         assertEquals(length, msg.length())
-        assertContentEquals(transactionId, msg.transactionId)
+        assertContentEquals(testMessage.transactionId, msg.transactionId)
     }
 
     @Test
