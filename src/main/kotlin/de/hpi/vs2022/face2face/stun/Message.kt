@@ -15,7 +15,7 @@ data class Message(
 
         buffer.apply {
             putShort(type.value)
-            putShort((4 + attributesLength).toShort())
+            putShort(attributesLength.toShort())
             putInt(magicCookie)
             put(transactionId)
         }
@@ -38,9 +38,11 @@ data class Message(
         fun tryFromPacket(buffer: ByteReadPacket): Message {
             val type = Type.fromValue(buffer.readShort())
                 ?: throw IllegalArgumentException("Given stream does not contain a valid stun message type!")
-            val length = buffer.readShort()
+            buffer.readShort() // discard length
+
             val cookie = buffer.readInt()
             assert(cookie == magicCookie)
+            
             val message = Message(
                 type,
                 buffer.readBytes(12)

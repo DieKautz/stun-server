@@ -17,7 +17,7 @@ interface Attribute {
 
     fun valueFromPacket(buffer: ByteReadPacket, message: Message) {
         val inType = buffer.readShort()
-        val inLength = buffer.readShort()
+        buffer.readShort() // discard length
         if (inType != type) {
             throw IllegalStateException("This attribute is not of type ${this.javaClass.simpleName}!")
         }
@@ -26,7 +26,7 @@ interface Attribute {
     private fun putHeaderBytes(buffer: ByteBuffer) {
         val length = length().toShort()
         buffer.putShort(type)
-        buffer.putShort(length)
+        buffer.putShort((length - headerSize).toShort())
     }
 
     val headerSize
