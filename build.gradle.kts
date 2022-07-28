@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "de.hpi.vs2022.face2face"
-version = "0.1.0"
+version = "0.2.0"
 application {
     mainClass.set("de.hpi.vs2022.face2face.ApplicationKt")
 

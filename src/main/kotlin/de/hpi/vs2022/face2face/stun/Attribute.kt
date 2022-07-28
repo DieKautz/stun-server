@@ -39,21 +39,19 @@ interface Attribute {
         )
 
         fun tryFromPacket(buffer: ByteReadPacket, message: Message): Attribute {
-            var attribute: Attribute? = null
             supportedAttributes.forEach {
-                attribute = it.createInstance()
+                val attribute = it.createInstance()
                 val tempBuff = buffer.copy()
                 try {
-                    attribute!!.valueFromPacket(tempBuff, message)
-                    return@forEach
+                    attribute.valueFromPacket(tempBuff, message)
+                    return attribute
                 } catch (ex: IllegalStateException) {
-                    attribute = null
                     tempBuff.close()
                 } finally {
                     tempBuff.close()
                 }
             }
-            return attribute ?: throw IllegalStateException("This attribute type is not supported!")
+            throw IllegalStateException("This attribute type is not supported!")
 
         }
     }
