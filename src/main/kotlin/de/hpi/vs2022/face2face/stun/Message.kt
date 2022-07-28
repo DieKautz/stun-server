@@ -18,9 +18,9 @@ data class Message(
             putShort((4 + attributesLength).toShort())
             putInt(magicCookie)
             put(transactionId)
-            attributes.forEach {
-                it.putBytes(this@apply)
-            }
+        }
+        attributes.forEach {
+            it.putBytes(buffer, this)
         }
     }
 
@@ -46,7 +46,7 @@ data class Message(
                 buffer.readBytes(12)
             )
             while (buffer.hasBytes(4)) {
-                message.attributes += Attribute.tryFromPacket(buffer)
+                message.attributes += Attribute.tryFromPacket(buffer, message)
             }
             return message
         }

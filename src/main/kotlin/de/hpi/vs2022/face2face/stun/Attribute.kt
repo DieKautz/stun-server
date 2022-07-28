@@ -1,23 +1,25 @@
 package de.hpi.vs2022.face2face.stun
 
 import de.hpi.vs2022.face2face.stun.attributes.MappedAddress
+import de.hpi.vs2022.face2face.stun.attributes.XorMappedAddress
 import io.ktor.utils.io.core.*
 import java.nio.ByteBuffer
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 interface Attribute {
-    var type: Short
+    val type: Short
 
     fun length(): Int
-    fun putBytes(buffer: ByteBuffer) {
+    fun putBytes(buffer: ByteBuffer, message: Message) {
         putHeaderBytes(buffer)
     }
 
-    fun valueFromPacket(buffer: ByteReadPacket) {
-        buffer.apply {
-            type = readShort()
-            readShort() // discard length
+    fun valueFromPacket(buffer: ByteReadPacket, message: Message) {
+        val inType = buffer.readShort()
+        val inLength = buffer.readShort()
+        if (inType != type) {
+            throw IllegalStateException("This attribute is not of type ${this.javaClass.simpleName}!")
         }
     }
 
@@ -31,14 +33,18 @@ interface Attribute {
         get() = 4
 
     companion object {
-        private val supportedAttributes = listOf<KClass<out Attribute>>(MappedAddress::class)
-        fun tryFromPacket(buffer: ByteReadPacket): Attribute {
+        private val supportedAttributes = listOf<KClass<out Attribute>>(
+            MappedAddress::class,
+            XorMappedAddress::class
+        )
+
+        fun tryFromPacket(buffer: ByteReadPacket, message: Message): Attribute {
             var attribute: Attribute? = null
             supportedAttributes.forEach {
                 attribute = it.createInstance()
                 val tempBuff = buffer.copy()
                 try {
-                    attribute!!.valueFromPacket(tempBuff)
+                    attribute!!.valueFromPacket(tempBuff, message)
                     return@forEach
                 } catch (ex: IllegalStateException) {
                     attribute = null
@@ -47,7 +53,7 @@ interface Attribute {
                     tempBuff.close()
                 }
             }
-            return attribute ?: throw IllegalStateException("Unsupported attribute type found!")
+            return attribute ?: throw IllegalStateException("This attribute type is not supported!")
 
         }
     }
