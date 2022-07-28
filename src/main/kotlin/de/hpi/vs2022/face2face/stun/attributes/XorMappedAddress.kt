@@ -6,6 +6,7 @@ import de.hpi.vs2022.face2face.stun.attributes.MappedAddress.IPFamily
 import de.hpi.vs2022.face2face.toByteArray
 import de.hpi.vs2022.face2face.xor
 import io.ktor.utils.io.core.*
+import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import kotlin.experimental.xor
 
@@ -15,6 +16,12 @@ data class XorMappedAddress(
     var address: ByteArray
 ) : Attribute {
     constructor() : this(IPFamily.V4, 0, byteArrayOf())
+
+    constructor(socketAddress: InetSocketAddress) : this(
+        if (socketAddress.address.address.size == 4) IPFamily.V4 else IPFamily.V6,
+        socketAddress.port.toShort(),
+        socketAddress.address.address
+    )
 
     private val magicCookie: Int = 0x2112A442
 

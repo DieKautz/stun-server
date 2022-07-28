@@ -1,7 +1,6 @@
 package de.hpi.vs2022.face2face
 
 import de.hpi.vs2022.face2face.stun.Message
-import de.hpi.vs2022.face2face.stun.attributes.MappedAddress.IPFamily
 import de.hpi.vs2022.face2face.stun.attributes.XorMappedAddress
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
@@ -33,17 +32,11 @@ fun main() {
                     datagram.packet.close()
                     LOG.info("Message type is binding request! txid:${incomingMessage.transactionId.toHex()}")
 
-                    val response = Message(
-                        Message.Type.BindingResponse,
-                        incomingMessage.transactionId
-                    )
-                    response.attributes += XorMappedAddress(
-                        if (socketAddress.address.address.size == 4) IPFamily.V4 else IPFamily.V6,
-                        socketAddress.port.toShort(),
-                        socketAddress.address.address
-                    )
+                    val response = Message(Message.Type.BindingResponse, incomingMessage.transactionId)
+                    response.attributes += XorMappedAddress(socketAddress)
                     val responseBuff = ByteBuffer.allocate(response.length())
                     response.putBytes(responseBuff)
+
                     LOG.info("Responding with ${responseBuff.array().toHex()}")
                     val responseDatagram = Datagram(ByteReadPacket(responseBuff.array()), datagram.address)
                     serverSocket.send(responseDatagram)
