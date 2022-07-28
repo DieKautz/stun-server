@@ -7,19 +7,27 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 interface Attribute {
-    val type: Short
+    var type: Short
 
-    fun length(): Short
-    fun putBytes(buffer: ByteBuffer)
-    fun valueFromPacket(buffer: ByteReadPacket)
+    fun length(): Int
+    fun putBytes(buffer: ByteBuffer) {
+        putHeaderBytes(buffer)
+    }
+
+    fun valueFromPacket(buffer: ByteReadPacket) {
+        buffer.apply {
+            type = readShort()
+            readShort() // discard length
+        }
+    }
 
     private fun putHeaderBytes(buffer: ByteBuffer) {
-        val length = length()
+        val length = length().toShort()
         buffer.putShort(type)
         buffer.putShort(length)
     }
 
-    private val headerSize
+    val headerSize
         get() = 4
 
     companion object {
