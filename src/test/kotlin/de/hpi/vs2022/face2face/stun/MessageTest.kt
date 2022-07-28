@@ -1,5 +1,6 @@
 package de.hpi.vs2022.face2face.stun
 
+import de.hpi.vs2022.face2face.createRandomMessageNoAttr
 import io.ktor.utils.io.core.*
 import org.jetbrains.annotations.TestOnly
 import org.junit.Test
@@ -10,12 +11,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 internal class MessageTest {
-
-    @TestOnly
-    internal fun createRandomMessageNoAttr() = Message(
-        Message.Type.values().random(),
-        Random.Default.nextBytes(12)
-    )
 
     @TestOnly
     private fun createMockMessageBytes(
@@ -73,7 +68,7 @@ internal class MessageTest {
             transactionId = Random.Default.nextBytes(12)
         )
         assertFailsWith(AssertionError::class) {
-            val msg = Message.tryFromPacket(ByteReadPacket(msgBytes))
+            Message.tryFromPacket(ByteReadPacket(msgBytes))
         }
     }
 }
