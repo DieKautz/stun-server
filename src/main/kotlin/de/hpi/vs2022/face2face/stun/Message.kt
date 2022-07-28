@@ -13,12 +13,14 @@ data class Message(
     fun putBytes(buffer: ByteBuffer) {
         val attributesLength = attributes.map { it.length() }.sum()
 
-        buffer.putShort(type.value)
-        buffer.putShort((4 + attributesLength).toShort())
-        buffer.putInt(magicCookie)
-        buffer.put(transactionId)
-        attributes.forEach {
-            it.putBytes(buffer)
+        buffer.apply {
+            putShort(type.value)
+            putShort((4 + attributesLength).toShort())
+            putInt(magicCookie)
+            put(transactionId)
+            attributes.forEach {
+                it.putBytes(this@apply)
+            }
         }
     }
 
