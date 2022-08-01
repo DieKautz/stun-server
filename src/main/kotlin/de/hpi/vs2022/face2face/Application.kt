@@ -26,23 +26,23 @@ fun main() {
             val incomingMessage = Message.tryFromPacket(datagram.packet)
             val socketAddress = (datagram.address.toJavaAddress() as java.net.InetSocketAddress)
 
-            LOG.info("datagram received from: ${socketAddress.address.hostAddress}")
+            LOG.debug("datagram received from: ${socketAddress.address.hostAddress}")
             when (incomingMessage.type) {
                 Message.Type.BindingRequest -> {
                     datagram.packet.close()
-                    LOG.info("Message type is binding request! txid:${incomingMessage.transactionId.toHex()}")
+                    LOG.debug("Message type is binding request! txid:${incomingMessage.transactionId.toHex()}")
 
                     val response = Message(Message.Type.BindingResponse, incomingMessage.transactionId)
                     response.attributes += XorMappedAddress(socketAddress)
                     val responseBuff = ByteBuffer.allocate(response.length())
                     response.putBytes(responseBuff)
 
-                    LOG.info("Responding with ${responseBuff.array().toHex()}")
+                    LOG.debug("Responding with ${responseBuff.array().toHex()}")
                     val responseDatagram = Datagram(ByteReadPacket(responseBuff.array()), datagram.address)
                     serverSocket.send(responseDatagram)
                 }
 
-                else -> LOG.info("unknown message type!")
+                else -> LOG.warn("Unknown message type! Message: $incomingMessage")
             }
         }
     }
