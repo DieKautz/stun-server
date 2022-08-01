@@ -37,7 +37,7 @@ data class Message(
         private const val magicCookie: Int = 0x2112A442
         fun tryFromPacket(buffer: ByteReadPacket): Message {
             val type = Type.fromValue(buffer.readShort())
-                ?: throw IllegalArgumentException("Given stream does not contain a valid stun message type!")
+                ?: throw IllegalArgumentException("Given stream does not contain a supported stun message type!")
             buffer.readShort() // discard length
 
             val cookie = buffer.readInt()
